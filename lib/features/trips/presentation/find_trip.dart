@@ -1,12 +1,34 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class find_trip extends StatelessWidget {
+  Future<void> fetchData()async{
+    Dio dio=new Dio();
+    final response= await dio.post('https://flutterapp2-3bb3d-default-rtdb.europe-west1.firebasedatabase.app/Trips.json',data: {"Name":"Alex","age":30,"gender":"male"});
+    if(response.statusCode==200){
+      print(response);
+    }
+  }
+  Future<void> getData()async{
+    Dio dio=new Dio();
+    final response=await dio.get('https://flutterapp2-3bb3d-default-rtdb.europe-west1.firebasedatabase.app/Users.json');
+    if(response.statusCode==200){
+      print(response);
+    }
+    
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: const Color.fromRGBO(255, 200, 40, 1),
+        appBar: AppBar(
+          title: const Text('Поиск поездок'),
+          backgroundColor: Colors.orange,
+
+
+        ),
 
         // 🔼 ОСНОВНОЙ КОНТЕНТ
         body: SafeArea(
@@ -90,11 +112,12 @@ class find_trip extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            '/trips',
-                                (route) => true,
-                          );
+                          // Navigator.pushNamedAndRemoveUntil(
+                          //   context,
+                          //   '/trips',
+                          //       (route) => true,
+                          // );
+                          fetchData();
                         },
                         child: const Text(
                           'Найти поездки',
