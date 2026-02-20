@@ -2,6 +2,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class find_trip extends StatelessWidget {
+
+
+
   Future<void> fetchData()async{
     Dio dio=new Dio();
     final response= await dio.post('https://flutterapp2-3bb3d-default-rtdb.europe-west1.firebasedatabase.app/Trips.json',data: {"Name":"Alex","age":30,"gender":"male"});

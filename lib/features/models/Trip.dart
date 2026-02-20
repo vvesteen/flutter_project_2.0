@@ -33,28 +33,26 @@ class Trip {
       'from': from?.trim(),
       'to': to?.trim(),
       'stops': stops,
-      'departureTime':
-      departureTime != null ? Timestamp.fromDate(departureTime!) : null,
+      'departureTime': departureTime?.toIso8601String(),
       'freeSeats': freeSeats,
       'pricePerSeat': pricePerSeat,
       'description': description?.trim(),
       'preferences': preferences,
-      'createdAt': FieldValue.serverTimestamp(),
-      'updatedAt': FieldValue.serverTimestamp(),
+      'createdAt': DateTime.now().toIso8601String(),
+      'updatedAt': DateTime.now().toIso8601String(),
       'status': 'planned',
-      // 'driverId': FirebaseAuth.instance.currentUser?.uid,
-      // 'driverName': FirebaseAuth.instance.currentUser?.displayName,
-      // ↑ раскомментируй, когда добавишь авторизацию
-    };
-  }
+      //'driverId': driverId,     // будет null — это ок
+      //'driverName': driverName, // будет null — это ок
+    };}
 
-  // Если потом захочешь создавать объект из Firestore
   factory Trip.fromMap(Map<String, dynamic> map) {
     return Trip()
       ..from = map['from'] as String?
       ..to = map['to'] as String?
       ..stops = List<String>.from(map['stops'] ?? [])
-      ..departureTime = (map['departureTime'] as Timestamp?)?.toDate()
+      ..departureTime = map['departureTime'] != null
+          ? DateTime.tryParse(map['departureTime'] as String)
+          : null
       ..freeSeats = map['freeSeats'] as int? ?? 1
       ..pricePerSeat = (map['pricePerSeat'] as num?)?.toDouble()
       ..description = map['description'] as String?

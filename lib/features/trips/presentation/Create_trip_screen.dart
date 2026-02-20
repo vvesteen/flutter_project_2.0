@@ -1,11 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-import '../presentation//Trip.dart';
+import 'package:firebase_database/firebase_database.dart';
+import '../../models/Trip.dart';
 
 class CreateTripScreen extends StatefulWidget {
+
   const CreateTripScreen({super.key});
+
+
 
   @override
   State<CreateTripScreen> createState() => _CreateTripScreenState();
@@ -29,11 +33,13 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
     super.dispose();
   }
 
+
+
   Future<void> _publishTrip() async {
     if (!_trip.isValid) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Проверьте, все ли обязательные поля заполнены'),
+          content: Text('Заполните все обязательные поля'),
           backgroundColor: Colors.red,
         ),
       );
@@ -43,47 +49,52 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await FirebaseFirestore.instance
-          .collection('trips')
-          .add(_trip.toMap());
-
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Поездка успешно опубликована!'),
-          backgroundColor: Colors.green,
-        ),
+      final dio = Dio();
+      final response = await dio.post(
+        'https://flutterapp2-3bb3d-default-rtdb.europe-west1.firebasedatabase.app/Trips.json',
+        data: _trip.toMap(),
       );
 
-      Navigator.pop(context);
-    } catch (e, stackTrace) {
-      if (!mounted) return;
+      if (response.statusCode == 200) {
+        print('Успех: ${response.data}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Поездка успешно опубликована!'),
+            backgroundColor: Colors.green,
+          ),
+        );
 
-      // Выводим подробности в консоль — это поможет понять настоящую проблему
-      print('Ошибка при сохранении в Firestore:');
+        // Очистка формы после успеха (рекомендую)
+        _fromController.clear();
+        _toController.clear();
+        _descriptionController.clear();
+        setState(() {
+          _trip.from = null;
+          _trip.to = null;
+          _trip.departureTime = null;
+          _trip.pricePerSeat = null;
+          _trip.description = null;
+          _trip.stops.clear();
+          _currentStep = 0;
+        });
+
+        // Navigator.pop(context); // ← раскомментируй, если хочешь закрывать экран
+      } else {
+        throw Exception('HTTP ошибка: ${response.statusCode}');
+      }
+    } catch (e, stackTrace) {
+      print('Ошибка при сохранении:');
       print(e);
       print(stackTrace);
 
-      String userMessage = 'Не удалось сохранить поездку';
+      String message = 'Не удалось сохранить поездку';
 
-      // Пытаемся показать понятное сообщение пользователю
-      if (e is FirebaseException) {
-        if (e.code == 'permission-denied') {
-          userMessage = 'Нет прав на запись. Проверьте правила Firestore';
-        } else if (e.code == 'unauthenticated') {
-          userMessage = 'Требуется авторизация';
-        } else {
-          userMessage = 'Firebase ошибка: ${e.code} — ${e.message ?? 'нет описания'}';
-        }
+      if (e.toString().contains('permission_denied')) {
+        message = 'Нет прав на запись — проверьте правила Realtime Database';
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(userMessage),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 6),
-        ),
+        SnackBar(content: Text(message), backgroundColor: Colors.red),
       );
     } finally {
       if (mounted) {

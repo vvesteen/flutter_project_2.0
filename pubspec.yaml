@@ -36,10 +36,12 @@ dependencies:
   cloud_firestore: ^5.0.0   # для поездок, профилей, чата
   firebase_storage: ^12.0.0 # для фото авто/профиля
   firebase_messaging: ^15.0.0  # push-уведомления (опционально позже)
+  firebase_database: ^11.1.4
 
   # Если используешь state management (рекомендую)
   riverpod: ^2.5.0          # или provider / bloc
   intl: ^0.19.0
+  cached_network_image: ^3.4.1  # для фото
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
