@@ -19,7 +19,7 @@ class _HomeWithBottomNavState extends State<HomeWithBottomNav> {
   final List<Widget> _screens = [
     const Center(child: Text("Мои поездки")),
     CreateTripScreen(),
-    find_trip(),
+    FindTrip(),
     //const Center(child: Text("Мой профиль")),
     UserProfileScreen(),
     //const Center(child: Text("Аккаунт")),

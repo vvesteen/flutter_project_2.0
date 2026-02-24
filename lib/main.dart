@@ -28,7 +28,7 @@ void main() async {
   // await Firebase.initializeApp(
   //   options: DefaultFirebaseOptions.currentPlatform,
   // );
-
+  await Firebase.initializeApp();
   // Очень важно для DateFormat с 'ru' (и других локалей)
   await initializeDateFormatting('ru'); // русский язык — месяцы будут «февраля», «марта» и т.д.
 
@@ -56,7 +56,7 @@ class MyApp extends StatelessWidget {
         '/enterCode': (context) =>  Entercode(),
         '/enterName': (context) =>  Entername(),
         '/home': (context) =>  HomeWithBottomNav(),
-        '/findTrip': (context) => find_trip(),
+        '/findTrip': (context) => FindTrip(),
         '/createTrip': (context) =>  CreateTripScreen(),
         '/profile' : (context) => UserProfileScreen(),
       },
