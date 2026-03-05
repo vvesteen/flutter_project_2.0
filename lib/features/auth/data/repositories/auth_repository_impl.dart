@@ -1,0 +1,40 @@
+import 'package:dartz/dartz.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth; // ← алиас обязателен!
+
+import '../../../../core/errors/failure.dart';
+import '../../domain/entities/UserEntity.dart';
+import '../../domain/entities/UserEntity.dart'; // ← маленькая 'u' в имени файла
+import '../../domain/repositories/auth_repository.dart';
+import '../datasources/auth_remote_datasource.dart';
+
+class AuthRepositoryImpl implements AuthRepository {
+  final AuthRemoteDataSource remoteDataSource;
+
+  AuthRepositoryImpl(this.remoteDataSource);
+
+  @override
+  Future<Either<Failure, UserEntity>> registerWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final userCredential = await remoteDataSource.registerWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      final firebaseUser = userCredential.user;
+
+      if (firebaseUser == null) {
+        return Left(ServerFailure(message: 'Пользователь не создан'));
+      }
+
+      final userEntity = UserEntity.fromFirebase(firebaseUser);
+      return Right(userEntity);
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      return Left(ServerFailure(message: e.message ?? 'Ошибка регистрации'));
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+}

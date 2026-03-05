@@ -37,6 +37,8 @@ dependencies:
   firebase_storage: ^12.0.0 # для фото авто/профиля
   firebase_messaging: ^15.0.0  # push-уведомления (опционально позже)
   firebase_database: ^11.1.4
+  dartz: ^0.10.1
+  provider: ^6.1.2
 
   # Если используешь state management (рекомендую)
   riverpod: ^2.5.0          # или provider / bloc
@@ -48,10 +50,13 @@ dependencies:
   cupertino_icons: ^1.0.8
   http: ^1.6.0
   dio: ^5.9.1
+  uni_links: ^0.5.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
