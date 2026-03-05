@@ -31,7 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  firebase_core: ^3.0.0     # обязательно первым!
+  firebase_core: ^3.15.2     # обязательно первым!
   firebase_auth: ^5.0.0     # для входа по телефону/Google
   cloud_firestore: ^5.0.0   # для поездок, профилей, чата
   firebase_storage: ^12.0.0 # для фото авто/профиля
