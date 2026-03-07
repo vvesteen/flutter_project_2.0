@@ -39,9 +39,9 @@ dependencies:
   firebase_database: ^11.1.4
   dartz: ^0.10.1
   provider: ^6.1.2
+  flutter_riverpod: ^3.2.1
 
   # Если используешь state management (рекомендую)
-  riverpod: ^2.5.0          # или provider / bloc
   intl: ^0.19.0
   cached_network_image: ^3.4.1  # для фото
 
