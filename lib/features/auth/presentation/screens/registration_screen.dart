@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../core/services/auth_service.dart';
-import '../data/datasources/auth_remote_datasource.dart';
-import '../data/repositories/auth_repository_impl.dart';
-import '../domain/usecases/register_with_email_usecase.dart';
-import 'controllers/registration_controller.dart';
+import '../../../../core/services/auth_service.dart';
+import '../../data/datasources/auth_remote_datasource.dart';
+import '../../data/repositories/auth_repository_impl.dart';
+import '../../domain/usecases/register_with_email_usecase.dart';
+import '../controllers/registration_controller.dart';
 
 
 class RegistrationScreen extends StatelessWidget {
@@ -102,18 +102,45 @@ class RegistrationScreen extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: controller.isLoading ? null : () => controller.register(context),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color.fromRGBO(255, 200, 40, 1),
                           foregroundColor: Colors.black,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        ),
-                        child: controller.isLoading
-                            ? const CircularProgressIndicator(color: Colors.black)
-                            : const Text('Зарегистрироваться', style: TextStyle(fontWeight: FontWeight.bold)),
+
                       ),
-                    ),
+                        // В RegistrationScreen, в onPressed кнопки «Продолжить»
+                        onPressed: () {
+                          final email = controller.emailController.text.trim();
+                          final pass  = controller.passwordController.text.trim();
+
+                          if (email.isEmpty || !email.contains('@')) {
+                            // покажи ошибку
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Введите корректный email')),
+                            );
+                            return;
+                          }
+
+                          if (pass.length < 6) {
+                            // ошибка
+                            return;
+                          }
+
+                          Navigator.pushNamed(
+                            context,
+                            '/enterName',
+                            arguments: {
+                              'email': email,
+                              'password': pass,
+                            },
+                          );
+                        },
+                      child: const Text(
+                        'Продолжить',
+                        style: TextStyle(fontWeight: FontWeight.bold, ),
+                      ),
+                    ),),
 
                     const SizedBox(height: 12),
 

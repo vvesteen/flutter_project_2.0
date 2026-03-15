@@ -1,12 +1,14 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_project_2/features/auth/presentation/screens/name_input_screen.dart';
 import 'package:flutter_project_2/features/profile/presentation/profile_data.dart';
-import 'package:flutter_project_2/features/trips/presentation/Create_trip_screen.dart';
-import 'package:flutter_project_2/features/trips/presentation/find_trip.dart';
+import 'package:flutter_project_2/features/trips/create_trip/Create_trip_screen.dart';
+import 'package:flutter_project_2/features/trips/find_trip/find_trip.dart';
 import 'package:flutter_project_2/registration/EnterCode.dart';
 import 'package:flutter_project_2/registration/EnterName.dart';
 import 'package:flutter_project_2/registration/login_screen.dart';
-import 'package:flutter_project_2/features/auth/presentation/registration_screen.dart';
+import 'package:flutter_project_2/features/auth/presentation/screens/registration_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'features/widgets/home_with_bottom_nav.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:firebase_core/firebase_core.dart'; // если используешь Firebase
@@ -34,7 +36,11 @@ void main() async {
 // Если планируешь поддерживать кыргызский язык позже:
 // await initializeDateFormatting('ky'); // пока поддержка слабая, но можно попробовать
 
-  runApp(const MyApp());
+  runApp(
+    const ProviderScope(  // ← вот эта обёртка обязательна!
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -49,11 +55,11 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green, // или другой цвет, который тебе нравится
         useMaterial3: true,
       ),
-      initialRoute: '/login_screen',
+      initialRoute: '/registration',
       routes: {
-        '/login_screen': (context) =>  LoginScreen(),
+        '/enterName': (context) =>  NameInputScreen(),
         '/registration': (context) =>  RegistrationScreen(),
-        '/enterName': (context) =>  Entername(),
+       // '/enterName': (context) =>  Entername(),
         '/home': (context) =>  HomeWithBottomNav(),
         '/findTrip': (context) => FindTrip(),
         '/createTrip': (context) =>  CreateTripScreen(),

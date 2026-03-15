@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project_2/features/trips/presentation/Create_trip_screen.dart';
-import 'package:flutter_project_2/features/trips/presentation/find_trip.dart';
+import 'package:flutter_project_2/features/trips/create_trip/Create_trip_screen.dart';
+import 'package:flutter_project_2/features/trips/find_trip/presentation/screens/find_trips_screen.dart';
 
 import '../profile/presentation/profile_data.dart';
+import '../trips/find_trip/presentation/screens/find_trips_screen.dart';
 import 'bottom_nav_bar.dart';
 
 
@@ -19,7 +20,7 @@ class _HomeWithBottomNavState extends State<HomeWithBottomNav> {
   final List<Widget> _screens = [
     const Center(child: Text("Мои поездки")),
     CreateTripScreen(),
-    FindTrip(),
+    FindTripsScreen(),
     //const Center(child: Text("Мой профиль")),
     UserProfileScreen(),
     //const Center(child: Text("Аккаунт")),

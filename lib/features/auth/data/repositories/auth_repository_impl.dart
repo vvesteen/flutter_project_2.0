@@ -16,11 +16,18 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, UserEntity>> registerWithEmailAndPassword({
     required String email,
     required String password,
+    required String name,
+    required String surname,
+    required String patronymic,
   }) async {
     try {
       final userCredential = await remoteDataSource.registerWithEmailAndPassword(
         email: email,
         password: password,
+        name: name,
+        surname: surname,
+        patronymic: patronymic
+
       );
 
       final firebaseUser = userCredential.user;

@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -8,8 +6,7 @@ import 'package:flutter_project_2/features/trips/find_trip/data/repositories/tri
 import 'package:flutter_project_2/features/trips/find_trip/domain/usecases/search_trips_usecase.dart';
 import 'package:flutter_project_2/features/trips/find_trip/data/datasources/trip_remote_datasource.dart';
 import 'package:flutter_project_2/features/trips/find_trip/domain/entities/trip.dart';
-
-
+import 'package:flutter_project_2/features/trips/find_trip/presentation/widgets/trip_card.dart';
 
 final searchTripsUseCaseProvider = Provider<SearchTripsUseCase>((ref) {
   final repo = TripRepositoryImpl(TripRemoteDataSource());
@@ -39,14 +36,21 @@ class FindTripsScreen extends ConsumerWidget {
     final date = ref.watch(searchDateProvider);
     final tripsAsync = ref.watch(filteredTripsProvider);
 
+    final hasFilters = from.isNotEmpty || to.isNotEmpty || date != null;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Поиск поездок'), backgroundColor: Colors.orange),
+      appBar: AppBar(
+        title: const Text('Поиск поездок'),
+        backgroundColor: Colors.orange,
+        elevation: 0,
+      ),
       backgroundColor: const Color.fromRGBO(255, 200, 40, 1),
       body: Column(
         children: [
           // Фильтры
-          Padding(
+          Container(
             padding: const EdgeInsets.all(16),
+            color: Colors.white,
             child: Column(
               children: [
                 TextField(
@@ -62,7 +66,7 @@ class FindTripsScreen extends ConsumerWidget {
                 GestureDetector(
                   onTap: () async {
                     final picked = await showDatePicker(
-                      context: context,  // ← обязательно добавить!
+                      context: context,
                       initialDate: DateTime.now(),
                       firstDate: DateTime.now(),
                       lastDate: DateTime.now().add(const Duration(days: 365)),
@@ -74,43 +78,62 @@ class FindTripsScreen extends ConsumerWidget {
                   },
                   child: AbsorbPointer(
                     child: TextField(
+                      readOnly: true,
                       controller: TextEditingController(
-                        text: ref.watch(searchDateProvider) != null
-                            ? DateFormat('dd.MM.yyyy').format(ref.watch(searchDateProvider)!)
+                        text: date != null
+                            ? DateFormat('dd.MM.yyyy').format(date)
                             : '',
                       ),
                       decoration: _inputDecoration('Дата (опционально)'),
                     ),
                   ),
                 ),
+                if (hasFilters)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton.icon(
+                      onPressed: () {
+                        ref.read(searchFromProvider.notifier).state = '';
+                        ref.read(searchToProvider.notifier).state = '';
+                        ref.read(searchDateProvider.notifier).state = null;
+                      },
+                      icon: const Icon(Icons.clear, size: 18),
+                      label: const Text('Очистить'),
+                    ),
+                  ),
               ],
             ),
           ),
 
+          // Список поездок
           Expanded(
             child: tripsAsync.when(
               data: (trips) => trips.isEmpty
-                  ? const Center(child: Text('Поездки не найдены'))
+                  ? const Center(
+                child: Text(
+                  'Поездки не найдены\nПопробуйте изменить фильтры',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              )
                   : ListView.builder(
+                padding: const EdgeInsets.all(16),
                 itemCount: trips.length,
-                itemBuilder: (ctx, i) {
-                  final trip = trips[i];
-                  return Card(
-                    child: ListTile(
-                      title: Text('${trip.from} → ${trip.to}'),
-                      subtitle: Text(
-                        '${DateFormat('dd.MM.yyyy HH:mm').format(trip.departureTime)}\n'
-                            '${trip.freeSeats} мест • ${trip.pricePerSeat?.toStringAsFixed(0) ?? '?'} сом',
-                      ),
-                      onTap: () {
-                        // Переход к деталям
-                      },
-                    ),
+                itemBuilder: (context, index) {
+                  final trip = trips[index];
+                  return TripCard(
+                    trip: trip,
+                    onTap: () {
+                      // TODO: переход на экран деталей поездки
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Открыта поездка ${trip.from} → ${trip.to}')),
+                      );
+                    },
                   );
                 },
               ),
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, st) => Center(child: Text('Ошибка: $err')),
+              error: (err, stack) => Center(child: Text('Ошибка: $err')),
             ),
           ),
         ],
@@ -122,8 +145,12 @@ class FindTripsScreen extends ConsumerWidget {
     return InputDecoration(
       hintText: hint,
       filled: true,
-      fillColor: Colors.white,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+      fillColor: Colors.grey[100],
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
     );
   }
 }

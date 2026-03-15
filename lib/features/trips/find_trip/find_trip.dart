@@ -67,8 +67,7 @@ class _FindTripState extends State<FindTrip> {
         _filteredTrips = _filterTrips(trips); // применяем текущие фильтры
       });
     }, onError: (error) {
-      setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
+      setState(() => _isLoading = false);      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Ошибка загрузки: $error')),
       );
     });

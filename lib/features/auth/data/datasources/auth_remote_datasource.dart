@@ -15,10 +15,18 @@ class AuthRemoteDataSource {
   Future<UserCredential> registerWithEmailAndPassword({
     required String email,
     required String password,
+    required String name,
+    required String surname,
+    required String patronymic
   }) async {
     return await authService.registerWithEmailAndPassword(
       email: email,
       password: password,
+      name: name,
+      surname: surname,
+      patronymic: patronymic
+
+
     );
   }
 }

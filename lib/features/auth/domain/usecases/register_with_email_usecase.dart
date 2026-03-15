@@ -11,10 +11,16 @@ class RegisterWithEmailUseCase {
   Future<Either<Failure, UserEntity>> call({
     required String email,
     required String password,
+    required String name,
+    required String surname,
+    required String patronymic
   }) async {
     return await repository.registerWithEmailAndPassword(
       email: email,
       password: password,
+      name: name,
+      surname: surname,
+      patronymic: patronymic,
     );
   }
 }
