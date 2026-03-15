@@ -6,7 +6,7 @@ import 'package:flutter_project_2/features/trips/create_trip/Create_trip_screen.
 import 'package:flutter_project_2/features/trips/find_trip/find_trip.dart';
 import 'package:flutter_project_2/registration/EnterCode.dart';
 import 'package:flutter_project_2/registration/EnterName.dart';
-import 'package:flutter_project_2/registration/login_screen.dart';
+import 'package:flutter_project_2/features/login_email/presentation/login_screen.dart';
 import 'package:flutter_project_2/features/auth/presentation/screens/registration_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'features/widgets/home_with_bottom_nav.dart';
@@ -55,10 +55,11 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green, // или другой цвет, который тебе нравится
         useMaterial3: true,
       ),
-      initialRoute: '/registration',
+      initialRoute: '/login',
       routes: {
         '/enterName': (context) =>  NameInputScreen(),
         '/registration': (context) =>  RegistrationScreen(),
+        '/login': (context) =>  LoginScreen(),
        // '/enterName': (context) =>  Entername(),
         '/home': (context) =>  HomeWithBottomNav(),
         '/findTrip': (context) => FindTrip(),
