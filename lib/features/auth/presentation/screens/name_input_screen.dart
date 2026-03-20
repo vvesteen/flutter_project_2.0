@@ -26,6 +26,8 @@ class NameInputScreen extends StatelessWidget {
       ),
       child: Consumer<RegistrationController>(
         builder: (context, controller, child) {
+          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
           return Scaffold(
             backgroundColor: const Color.fromRGBO(255, 200, 40, 1),
             body: Center(
@@ -95,46 +97,69 @@ class NameInputScreen extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),
 
+
+                   /* SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromRGBO(255, 200, 40, 1),
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () {
+                          //Navigator.pushNamed(context, '/nameData');
+                          Navigator.pushNamedAndRemoveUntil(context, '/additional_data', (route) => true);
+
+                        },
+                        child: const Text(
+                          'Далее',
+                          style: TextStyle(fontWeight: FontWeight.bold, ),
+                        ),
+                      ),
+                    ),*/
+
                     // Кнопка
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        // В NameInputScreen → в onPressed «Зарегистрироваться»
-                        onPressed: controller.isLoading ? null : () async {
-                          final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-
-                          final email    = args?['email']    as String? ?? '';
-                          final password = args?['password'] as String? ?? '';
-
-                          if (email.isEmpty || password.isEmpty) {
-                            // критическая ошибка — email/пароль потерялись
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Ошибка: данные авторизации потеряны')),
-                            );
-                            return;
-                          }
-
-                          controller.register(context, email, password);
-                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color.fromRGBO(255, 200, 40, 1),
                           foregroundColor: Colors.black,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        ),
-                        child: controller.isLoading
-                            ? const CircularProgressIndicator(color: Colors.black)
-                            : const Text('Зарегистрироваться', style: TextStyle(fontWeight: FontWeight.bold)),
 
-                      ),
-                    ),
+                        ),
+                        onPressed: () {
+
+
+                          final name = controller.nameController.text.trim();
+                          final surname = controller.surnameController.text.trim();
+                          final patronymic = controller.patronymicController.text.trim();
+
+                          Navigator.pushNamed(
+                            context,
+                            '/additional_data',
+                            arguments: {
+                              'email': args?['email'],
+                              'password': args?['password'],
+                              'name': name,
+                              'surname': surname,
+                              'patronymic': patronymic,
+                            },
+                          );
+                        },
+                        child: const Text(
+                          'Продолжить',
+                          style: TextStyle(fontWeight: FontWeight.bold, ),
+                        ),
+                      ),),
 
                     const SizedBox(height: 12),
 
-                    TextButton(
-                      onPressed: () => Navigator.pushNamed(context, '/login_screen'),
-                      child: const Text('Уже есть аккаунт? Войти'),
-                    ),
+
                   ],
                 ),
               ),

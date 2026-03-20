@@ -1,47 +1,37 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter_project_2/features/auth/presentation/screens/add_data_screen.dart';
 import 'package:flutter_project_2/features/auth/presentation/screens/name_input_screen.dart';
-import 'package:flutter_project_2/features/profile/presentation/profile_data.dart';
 import 'package:flutter_project_2/features/trips/create_trip/Create_trip_screen.dart';
 import 'package:flutter_project_2/features/trips/find_trip/find_trip.dart';
 import 'package:flutter_project_2/registration/EnterCode.dart';
-import 'package:flutter_project_2/registration/EnterName.dart';
 import 'package:flutter_project_2/features/login_email/presentation/login_screen.dart';
 import 'package:flutter_project_2/features/auth/presentation/screens/registration_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'core/di/injection_container.dart' as di;
+import 'features/profile/presentation/screens/user_profile_page.dart';
 import 'features/widgets/home_with_bottom_nav.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:firebase_core/firebase_core.dart'; // если используешь Firebase
-import 'firebase_options.dart';  // ← этот импорт обязателен!
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-
-// ← Добавь свой сгенерированный файл конфигурации Firebase
-// import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-
-// Инициализация Firebase (если используешь)
-// await Firebase.initializeApp(
-//   options: DefaultFirebaseOptions.currentPlatform,
-// );
-
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,  // ← это фиксит null на web и работает везде
+    options: DefaultFirebaseOptions.currentPlatform,
   );
-// Очень важно для DateFormat с 'ru' (и других локалей)
-  await initializeDateFormatting('ru'); // русский язык — месяцы будут «февраля», «марта» и т.д.
+  await initializeDateFormatting('ru');
 
-// Если планируешь поддерживать кыргызский язык позже:
-// await initializeDateFormatting('ky'); // пока поддержка слабая, но можно попробовать
 
+  await di.initDependencies();   // или sl.init() / setupLocator() — как у тебя называется
   runApp(
-    const ProviderScope(  // ← вот эта обёртка обязательна!
+    const ProviderScope(
       child: MyApp(),
     ),
   );
 }
+
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -50,24 +40,22 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Попутчики Кыргызстан', // можно поменять на своё
+      title: 'Попутчики Кыргызстан',
       theme: ThemeData(
-        primarySwatch: Colors.green, // или другой цвет, который тебе нравится
+        primarySwatch: Colors.green,
         useMaterial3: true,
       ),
       initialRoute: '/login',
       routes: {
-        '/enterName': (context) =>  NameInputScreen(),
+        '/NameInputScreen': (context) =>  NameInputScreen(),
         '/registration': (context) =>  RegistrationScreen(),
         '/login': (context) =>  LoginScreen(),
-       // '/enterName': (context) =>  Entername(),
         '/home': (context) =>  HomeWithBottomNav(),
         '/findTrip': (context) => FindTrip(),
         '/createTrip': (context) =>  CreateTripScreen(),
-        '/profile' : (context) => UserProfileScreen(),
-          '/enterCode': (context) =>  Entercode(),          // ← добавь это
-          // '/enterPhone': (context) => const EnterPhoneScreen(), // если есть экран
-
+        '/profile' : (context) => UserProfilePage(),
+          '/enterCode': (context) =>  Entercode(),
+        '/additional_data': (context) => AddDataScreen(),
       },
     );
   }

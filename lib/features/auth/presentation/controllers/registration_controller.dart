@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/services/auth_service.dart';
 import '../../domain/usecases/register_with_email_usecase.dart';
+import '../../../../core/entities/UserEntity.dart';
+
 import '../../../../core/errors/failure.dart';
 
 class RegistrationController extends ChangeNotifier {
@@ -15,6 +17,11 @@ class RegistrationController extends ChangeNotifier {
   final nameController = TextEditingController();
   final surnameController = TextEditingController();
   final patronymicController = TextEditingController();
+  final dateOfBirthController = TextEditingController();
+  final sexController = TextEditingController();
+  final phoneNumberController = TextEditingController();
+
+
 
 
   bool _isLoading = false;
@@ -44,6 +51,10 @@ class RegistrationController extends ChangeNotifier {
         name: nameController.text.trim(),
         surname: surnameController.text.trim(),
         patronymic: patronymicController.text.trim(),
+        dateOfBirth: DateTime.parse(dateOfBirthController.text),
+        sex: sexController.text.trim(),
+        phoneNumber: phoneNumberController.text.trim(),
+
       );
 
       // Успех
@@ -102,6 +113,9 @@ class RegistrationController extends ChangeNotifier {
     nameController.dispose();
     surnameController.dispose();
     patronymicController.dispose();
+    dateOfBirthController.dispose();
+    sexController.dispose();
+    phoneNumberController.dispose();
     super.dispose();
   }
 }

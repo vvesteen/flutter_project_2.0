@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
+import '../../../../core/entities/UserEntity.dart';
 import '../../../../core/errors/failure.dart';
-import '../../domain/entities/user_entity.dart';
-import '../entities/user_entity.dart';
+import '../../../../core/entities/UserEntity.dart';
 
 
 abstract class AuthRepository {

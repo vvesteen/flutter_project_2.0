@@ -14,11 +14,16 @@ class AuthService {
     required String surname,
     required String name,
     required String patronymic,
+    required DateTime dateOfBirth,
+    required String sex,
+    required String phoneNumber,
   }) async {
     try {
       final credential = await _auth.createUserWithEmailAndPassword(
         email: email.trim(),
         password: password.trim(),
+
+
       );
 
       final user = credential.user;
@@ -32,6 +37,9 @@ class AuthService {
         'surname': surname.trim(),
         'patronymic': patronymic.trim(),
         'fullName': '${surname.trim()} ${name.trim()} ${patronymic.trim()}'.trim(),
+        'dateOfBirth': dateOfBirth,
+        'sex': sex.trim(),
+        'phoneNumber': phoneNumber.trim(),
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));

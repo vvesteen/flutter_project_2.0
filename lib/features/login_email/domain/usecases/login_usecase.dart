@@ -1,8 +1,7 @@
 import 'package:dartz/dartz.dart';
-import 'package:flutter_project_2/features/login_email/domain/entities/user_entity.dart';
 import '../../../../../../core/errors/failure.dart';
 import 'package:flutter_project_2/features/login_email/domain/repositories/auth_repository.dart';
-import '../entities/user_entity.dart';
+import '../../../../core/entities/UserEntity.dart';
 
 class LoginWithEmailUseCase {
   final AuthRepository repository;

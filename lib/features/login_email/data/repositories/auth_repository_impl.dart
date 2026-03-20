@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../../../core/errors/failure.dart';
 import '../datasources/auth_remote_datasource.dart';
 import 'package:flutter_project_2/features/login_email/domain/repositories/auth_repository.dart';
-import '../../domain/entities/user_entity.dart';
+import '../../../../core/entities/UserEntity.dart';
 
 
 

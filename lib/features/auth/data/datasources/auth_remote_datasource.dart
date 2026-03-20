@@ -3,7 +3,7 @@ import '../../../../core/services/auth_service.dart';
 import 'package:dartz/dartz.dart';  // ← всегда package: для dartz
 
 import '../../../../core/errors/failure.dart';               // 7 уровней вверх
-import '../../domain/entities/UserEntity.dart';              // от data → domain
+import '../../../../core/entities/UserEntity.dart';              // от data → domain
 import '../../domain/repositories/auth_repository.dart';      // от data → domain
 import '../datasources/auth_remote_datasource.dart';          // соседняя папка datasources
 
@@ -17,14 +17,21 @@ class AuthRemoteDataSource {
     required String password,
     required String name,
     required String surname,
-    required String patronymic
+    required String patronymic,
+    required DateTime dateOfBirth,
+    required String sex,
+    required String phoneNumber,
+
   }) async {
     return await authService.registerWithEmailAndPassword(
       email: email,
       password: password,
       name: name,
       surname: surname,
-      patronymic: patronymic
+      patronymic: patronymic,
+      dateOfBirth: dateOfBirth,
+      sex: sex,
+      phoneNumber: phoneNumber,
 
 
     );

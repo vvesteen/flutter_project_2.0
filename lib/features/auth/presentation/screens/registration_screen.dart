@@ -129,7 +129,7 @@ class RegistrationScreen extends StatelessWidget {
 
                           Navigator.pushNamed(
                             context,
-                            '/enterName',
+                            '/NameInputScreen',
                             arguments: {
                               'email': email,
                               'password': pass,

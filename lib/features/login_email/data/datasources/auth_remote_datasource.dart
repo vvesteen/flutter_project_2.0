@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../domain/entities/user_entity.dart';
+import '../../../../core/entities/UserEntity.dart';
 
 class AuthRemoteDataSource {
   final FirebaseAuth _auth;
@@ -23,7 +23,6 @@ class AuthRemoteDataSource {
     return UserEntity(
       uid: firebaseUser.uid,
       email: firebaseUser.email,
-      displayName: firebaseUser.displayName,
     );
   }
 

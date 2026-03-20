@@ -2,8 +2,8 @@ import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth; // ← алиас обязателен!
 
 import '../../../../core/errors/failure.dart';
-import '../../domain/entities/UserEntity.dart';
-import '../../domain/entities/UserEntity.dart'; // ← маленькая 'u' в имени файла
+import '../../../../core/entities/UserEntity.dart';
+import '../../../../core/entities/UserEntity.dart'; // ← маленькая 'u' в имени файла
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_datasource.dart';
 
@@ -19,6 +19,9 @@ class AuthRepositoryImpl implements AuthRepository {
     required String name,
     required String surname,
     required String patronymic,
+    required DateTime dateOfBirth,
+    required String sex,
+    required String phoneNumber,
   }) async {
     try {
       final userCredential = await remoteDataSource.registerWithEmailAndPassword(
@@ -26,7 +29,10 @@ class AuthRepositoryImpl implements AuthRepository {
         password: password,
         name: name,
         surname: surname,
-        patronymic: patronymic
+        patronymic: patronymic,
+        dateOfBirth: dateOfBirth,
+        sex: sex,
+        phoneNumber: phoneNumber,
 
       );
 
