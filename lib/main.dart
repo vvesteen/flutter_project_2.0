@@ -8,6 +8,7 @@ import 'package:flutter_project_2/features/login_email/presentation/login_screen
 import 'package:flutter_project_2/features/auth/presentation/screens/registration_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/di/injection_container.dart' as di;
+import 'features/cars/presentation/screens/add_car_screen.dart';
 import 'features/profile/presentation/screens/user_profile_page.dart';
 import 'features/widgets/home_with_bottom_nav.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -56,6 +57,7 @@ class MyApp extends StatelessWidget {
         '/profile' : (context) => UserProfilePage(),
           '/enterCode': (context) =>  Entercode(),
         '/additional_data': (context) => AddDataScreen(),
+        '/add_car_screen': (context) => AddCarScreen(),
       },
     );
   }

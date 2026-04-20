@@ -315,6 +315,21 @@ class _UserProfileView extends StatelessWidget {
               child: const Text('Выйти из аккаунта'),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: FilledButton.tonal(
+              style: FilledButton.styleFrom(
+                foregroundColor: Colors.red,
+                minimumSize: const Size.fromHeight(52),
+              ),
+              onPressed: () {
+                //FirebaseAuth.instance.signOut(); //навигация на логин
+                Navigator.pushNamed(context, '/add_car_screen');
+              },
+              child: const Text('Добавить машину'),
+            ),
+          ),
+
 
           const SizedBox(height: 60),
         ],
