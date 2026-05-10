@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class BottomNavBar extends StatelessWidget {
@@ -21,16 +22,20 @@ class BottomNavBar extends StatelessWidget {
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.history),
-          label: 'Поездки',
+          label: 'Мои поездки',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.add_circle),
-          label: 'Добавить',
+          label: 'Создать поездку',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
-          label: 'Главная',
+          label: 'Поиск поездок',
         ),
+      //  BottomNavigationBarItem(
+        //  icon: Icon(CupertinoIcons.map_pin_ellipse),
+          //label: 'Карта',
+        //),
         BottomNavigationBarItem(
           icon: Icon(Icons.person),
           label: 'Профиль',

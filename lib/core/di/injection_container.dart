@@ -6,6 +6,7 @@ import 'package:get_it/get_it.dart';
 import '../../features/profile/data/datasources/profile_remote_datasource.dart';
 import '../../features/profile/data/repositories/profile_repository_impl.dart';
 import '../../features/profile/domain/repositories/profile_repository.dart';
+import '../../features/profile/domain/usecases/UpdateUserProfile.dart';
 import '../../features/profile/domain/usecases/get_current_user_profile.dart';   // ← подставь точное имя файла/usecase
 import '../../features/profile/presentation/bloc/profile_bloc.dart';
 
@@ -33,20 +34,26 @@ Future<void> initDependencies() async {
     ),
   );
 
-  // 3. UseCase
-// в injection_container.dart
-  sl.registerLazySingleton<GetCurrentUserProfile>(
-        () => GetCurrentUserProfile(
-      sl<ProfileRepository>(),   // ← без имени параметра
+  // UseCases
+  sl.registerLazySingleton(
+        () => GetCurrentUserProfile(sl()),
+  );
+
+  sl.registerLazySingleton(
+        () => UpdateUserProfile(sl()),
+  );
+
+  // Bloc
+  sl.registerFactory(
+        () => ProfileBloc(
+      getCurrentUserProfile: sl(),
+      updateUserProfile: sl(),
     ),
   );
 
-  // 4. Bloc — factory, а не singleton!
-  sl.registerFactory<ProfileBloc>(
-        () => ProfileBloc(
-      getCurrentUserProfile: sl<GetCurrentUserProfile>(),
-    ),
-  );
+
+
+
 
   // Если есть другие зависимости (auth, trips и т.д.) — они тоже здесь
 }

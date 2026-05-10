@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_project_2/features/widgets/safety_rules.dart';
 import 'package:get_it/get_it.dart';
+import '../../../../core/di/injection_container.dart';
 import '../../../widgets/_CarPlaceholder.dart';
 import '../bloc/profile_bloc.dart';
 import '../../../../core/entities/UserEntity.dart';
 import '../../../../features/widgets/StatChip.dart';
 import '../../../../features/widgets/_VerificationTile.dart';
+import 'edit_profile_page.dart';
 
 class UserProfilePage extends StatelessWidget {
   const UserProfilePage({super.key});
@@ -49,15 +51,20 @@ class _UserProfileView extends StatelessWidget {
           // Карандаш (редактировать)
           IconButton(
             icon: const Icon(Icons.edit_outlined),
-            tooltip: 'Редактировать',
-            onPressed: () {
-              // Если экрана редактирования пока нет → можно пока показать SnackBar
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Редактирование профиля в разработке')),
-              );
+            onPressed: () async {
+              final state = context.read<ProfileBloc>().state;
 
-              // Или переход, когда экран будет готов:
-              // Navigator.push(context, MaterialPageRoute(builder: (_) => EditProfileScreen()));
+              if (state is ProfileLoaded) {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => BlocProvider.value(
+                      value: context.read<ProfileBloc>(),
+                      child: EditProfilePage(user: state.user),
+                    ),
+                  ),
+                );
+              }
             },
           ),
         ],
@@ -206,6 +213,19 @@ class _UserProfileView extends StatelessWidget {
                 const SizedBox(width: 4),
                 const Icon(Icons.verified, color: Colors.green, size: 18),
               ],
+
+              Icon(Icons.person, color: colorScheme.primary, size: 22),
+              const SizedBox(width: 8),
+
+              Text(
+                [
+                  user.surname,
+                  user.name,
+                  user.patronymic,
+                ].where((e) => e != null && e.isNotEmpty).join(' '),
+                style: theme.textTheme.titleMedium,
+              ),
+
             ],
           ),
 
@@ -315,6 +335,8 @@ class _UserProfileView extends StatelessWidget {
               child: const Text('Выйти из аккаунта'),
             ),
           ),
+          const SizedBox(height: 15),
+
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32),
             child: FilledButton.tonal(
@@ -327,6 +349,26 @@ class _UserProfileView extends StatelessWidget {
                 Navigator.pushNamed(context, '/add_car_screen');
               },
               child: const Text('Добавить машину'),
+            ),
+          ),
+
+
+          const SizedBox(height: 15),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: FilledButton.tonal(
+              style: FilledButton.styleFrom(
+                foregroundColor: Colors.red,
+                minimumSize: const Size.fromHeight(52),
+              ),
+
+                onPressed: () {
+                  // Если экрана редактирования пока нет → можно пока показать SnackBar
+                 print("В разработке");
+                  },
+
+              child: const Text('Редактировать данные профиля'),
             ),
           ),
 

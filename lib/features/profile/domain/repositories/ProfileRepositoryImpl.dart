@@ -1,8 +1,9 @@
 import 'package:dartz/dartz.dart';
+import 'package:flutter_project_2/features/profile/domain/repositories/profile_repository.dart';
+
 import '../../../../core/entities/UserEntity.dart';
 import '../../../../core/errors/failure.dart';
-import '../../domain/repositories/profile_repository.dart';
-import '../datasources/profile_remote_datasource.dart';
+import '../../data/datasources/profile_remote_datasource.dart';
 
 class ProfileRepositoryImpl implements ProfileRepository {
   final ProfileRemoteDataSource remoteDataSource;
@@ -12,8 +13,8 @@ class ProfileRepositoryImpl implements ProfileRepository {
   @override
   Future<Either<Failure, UserEntity>> getCurrentUserProfile() async {
     try {
-      final user = await remoteDataSource.getCurrentUser();
-      return Right(user);
+      final model = await remoteDataSource.getCurrentUser();
+      return Right(model);
     } catch (e) {
       return Left(ServerFailure(message: e.toString()));
     }

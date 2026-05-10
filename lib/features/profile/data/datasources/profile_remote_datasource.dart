@@ -5,6 +5,7 @@ import 'package:flutter_project_2/core/entities/UserEntity.dart';
 
 abstract class ProfileRemoteDataSource {
   Future<UserEntity> getCurrentUser();
+  Future<void> updateUser(UserEntity user);
 }
 
 class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
@@ -39,5 +40,18 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
 
     // Используем существующий фабричный метод
     return UserEntity.fromMap(data, fbUser.uid);
+  }
+  @override
+  Future<void> updateUser(UserEntity user) async {
+    final fbUser = auth.currentUser;
+
+    if (fbUser == null) {
+      throw Exception('Пользователь не авторизован');
+    }
+
+    await firestore
+        .collection('users')
+        .doc(fbUser.uid)
+        .update(user.toMap());
   }
 }

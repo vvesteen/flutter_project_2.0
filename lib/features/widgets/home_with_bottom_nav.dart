@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project_2/features/trips/create_trip/Create_trip_screen.dart';
-import 'package:flutter_project_2/features/trips/find_trip/presentation/screens/find_trips_screen.dart';
 
 import '../profile/presentation/screens/user_profile_page.dart';
-import '../trips/find_trip/presentation/screens/find_trips_screen.dart';
+import '../trips/presentation/create_trip/screens/create_trip_screen.dart';
+import '../trips/presentation/find_trip/screens/find_trips_screen.dart';
 import 'bottom_nav_bar.dart';
 
 

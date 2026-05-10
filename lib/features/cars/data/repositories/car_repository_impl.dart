@@ -1,4 +1,3 @@
-// lib/features/create_trip/data/repositories/trip_repository_impl.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../domain/entities/car.dart';
 import '../../domain/repositories/car_repository.dart';

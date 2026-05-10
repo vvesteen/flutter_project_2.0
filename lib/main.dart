@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_project_2/features/auth/presentation/screens/add_data_screen.dart';
 import 'package:flutter_project_2/features/auth/presentation/screens/name_input_screen.dart';
-import 'package:flutter_project_2/features/trips/create_trip/Create_trip_screen.dart';
-import 'package:flutter_project_2/features/trips/find_trip/find_trip.dart';
+import 'package:flutter_project_2/features/trips/presentation/create_trip/screens/create_trip_screen.dart';
+import 'package:flutter_project_2/features/trips/presentation/find_trip/screens/find_trips_screen.dart';
 import 'package:flutter_project_2/registration/EnterCode.dart';
 import 'package:flutter_project_2/features/login_email/presentation/login_screen.dart';
 import 'package:flutter_project_2/features/auth/presentation/screens/registration_screen.dart';
@@ -52,12 +52,13 @@ class MyApp extends StatelessWidget {
         '/registration': (context) =>  RegistrationScreen(),
         '/login': (context) =>  LoginScreen(),
         '/home': (context) =>  HomeWithBottomNav(),
-        '/findTrip': (context) => FindTrip(),
+        '/findTrip': (context) => FindTripsScreen(),
         '/createTrip': (context) =>  CreateTripScreen(),
         '/profile' : (context) => UserProfilePage(),
           '/enterCode': (context) =>  Entercode(),
         '/additional_data': (context) => AddDataScreen(),
         '/add_car_screen': (context) => AddCarScreen(),
+       // '/trip_more_details': (context) => TripMoreDetails(),
       },
     );
   }
