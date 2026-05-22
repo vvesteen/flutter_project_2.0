@@ -1,6 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../login_email/data/datasources/auth_remote_datasource.dart';
+import '../../login_email/data/repositories/auth_repository_impl.dart';
+import '../domain/usecases/login_usecase.dart';
 import 'login_controller.dart'; // ← добавь зависимость provider в pubspec.yaml
 
 
@@ -10,7 +14,15 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => LoginController(),
+      create: (_) => LoginController(
+        LoginWithEmailUseCase(
+          AuthRepositoryImpl(
+            AuthRemoteDataSource(
+              FirebaseAuth.instance,
+            ),
+          ),
+        ),
+      ),
       child: Consumer<LoginController>(
         builder: (context, controller, child) {
           return Scaffold(
@@ -94,8 +106,20 @@ class LoginScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         ),
-                        onPressed: controller.isLoading ? null : () => controller.login(context),
-                        child: controller.isLoading
+                        onPressed: controller.isLoading
+                            ? null
+                            : () async {
+
+                          await controller.login();
+
+                          if (controller.errorMessage == null && context.mounted) {
+                            Navigator.pushNamedAndRemoveUntil(
+                              context,
+                              '/home',
+                                  (route) => false,
+                            );
+                          }
+                        },                        child: controller.isLoading
                             ? const SizedBox(
                           height: 20,
                           width: 20,

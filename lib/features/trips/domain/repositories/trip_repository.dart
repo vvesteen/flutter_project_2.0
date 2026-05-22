@@ -7,11 +7,17 @@ import '../entities/create_trip_model.dart';
 
 abstract class TripRepository {
   Future<void> createTrip(CreateTripModel model, String userId);
+  Stream<List<Trip>> getMyTrips(String userId);
 
   Stream<List<Trip>> searchTrips({
     String? from,
     String? to,
     DateTime? date,
+  });
+
+  Future<void> joinTrip({
+    required String tripId,
+    required String userId,
   });
 
 }

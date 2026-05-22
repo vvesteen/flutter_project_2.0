@@ -1,0 +1,4 @@
+enum CarSeatLayout {
+  sevenSeats,
+  eightSeats,
+}

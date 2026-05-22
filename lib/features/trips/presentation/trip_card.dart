@@ -4,19 +4,29 @@ import 'package:flutter_project_2/core/entities/trip.dart';
 class TripCard extends StatelessWidget {
   final Trip trip;
   final VoidCallback? onTap;
+  final String currentUserId;
 
   const TripCard({
     super.key,
     required this.trip,
     this.onTap,
+    required this.currentUserId,
   });
 
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('dd.MM.yyyy HH:mm');
-    final price = trip.pricePerSeat?.toStringAsFixed(0) ?? '?';
+    final price = trip.pricePerSeat.toStringAsFixed(0);
+    final isArchived =
+    trip.departureTime.isBefore(DateTime.now());
+
+    final isDriver =
+        trip.driverId == currentUserId;
 
     return Card(
+      color: isArchived
+          ? Colors.grey.shade300
+          : Colors.white,
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -89,21 +99,33 @@ class TripCard extends StatelessWidget {
                       ),
                     ],
                   ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
 
-                  // Правая часть (кнопка)
-                  ElevatedButton(
-                    onPressed: () {
-                      print('Карточка поездки');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromRGBO(50, 168, 68, 1),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                    decoration: BoxDecoration(
+                      color: isDriver
+                          ? Colors.green
+                          : Colors.blue,
+
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+
+                    child: Text(
+                      isDriver
+                          ? 'Вы - водитель'
+                          : 'Вы - пассажир',
+
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    child: const Text('Подписаться'),
                   ),
+
+
                 ],
               ),
 

@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../../../seats/Seat.dart';
+import '../../../../core/entities/car_seat_layout.dart';
 import '../../domain/entities/create_trip_model.dart';
 import '../../domain/repositories/trip_repository.dart';
 
@@ -53,19 +53,57 @@ class CreateTripController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updatePreference(String key, bool value) {
-    model.preferences[key] = value;
-    notifyListeners();
-  }
-
   void addStop() {
-    model.stops.add('Остановка ${model.stops.length + 1}');
+    model.stops.add('');
     notifyListeners();
   }
 
   void removeStop(int index) {
     model.stops.removeAt(index);
     notifyListeners();
+  }
+
+  void updatePreference(String key, bool value) {
+    model.preferences[key] = value;
+    notifyListeners();
+  }
+
+  // 👇 ВОТ СЮДА ВСТАВЛЯЕШЬ
+  void setLayout(CarSeatLayout layout) {
+    model.layout = layout;
+    notifyListeners();
+  }
+  String? validateTrip() {
+    if (model.from == null || model.from!.trim().isEmpty) {
+      return 'Введите пункт отправления';
+    }
+
+    if (model.to == null || model.to!.trim().isEmpty) {
+      return 'Введите пункт назначения';
+    }
+
+    if (model.departureTime.isBefore(DateTime.now())) {
+      return 'Дата не может быть в прошлом';
+    }
+
+    if (model.freeSeats <= 0) {
+      return 'Количество мест должно быть больше 0';
+    }
+
+    if (model.pricePerSeat == null) {
+      return 'Введите цену';
+    }
+
+    if (model.pricePerSeat! < 0) {
+      return 'Цена не может быть отрицательной';
+    }
+
+    if (model.description != null &&
+        model.description!.length > 150) {
+      return 'Слишком длинное описание. Сократите текст';
+    }
+
+    return null;
   }
 
   // 🚀 публикация
@@ -78,58 +116,51 @@ class CreateTripController extends ChangeNotifier {
       return;
     }
 
-    if (model.from == null ||
-        model.to == null ||
-        model.departureTime == null ||
-        model.pricePerSeat == null) {
-      errorMessage = 'Заполните обязательные поля';
+    // === Проверки для тестов ===
+    if (model.from == null || model.from!.trim().isEmpty) {
+      errorMessage = 'Введите пункт отправления';
+    } else if (model.to == null || model.to!.trim().isEmpty) {
+      errorMessage = 'Введите пункт назначения';
+    } else if (model.departureTime.isBefore(DateTime.now())) {
+      errorMessage = 'Дата не может быть в прошлом';
+    } else if (model.freeSeats <= 0) {
+      errorMessage = 'Количество мест должно быть больше 0';
+    } else if ((model.pricePerSeat ?? 0) < 0) {
+      errorMessage = 'Цена не может быть отрицательной';
+    } else if (model.description != null && model.description!.length > 150) {
+      errorMessage = 'Слишком длинное описание. Сократите текст';
+    }
+
+    if (errorMessage != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage!)),
+      );
       notifyListeners();
       return;
     }
 
+    // 🟢 предотвращение двойного создания
+    if (isLoading) return;
     isLoading = true;
-    errorMessage = null;
-    notifyListeners();
 
     try {
       await repository.createTrip(model, user.uid);
-
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Поездка создана'),
-          backgroundColor: Colors.green,
-        ),
+        const SnackBar(content: Text('Поездка успешно создана')),
       );
-
-      // reset
       model = CreateTripModel();
       fromController.clear();
       toController.clear();
       descriptionController.clear();
-
       currentStep = 0;
     } catch (e) {
       errorMessage = 'Ошибка: $e';
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(errorMessage!)));
     }
 
     isLoading = false;
     notifyListeners();
   }
-  List<Seat> generateSeats(int count) {
-    return List.generate(count, (index) {
-      return Seat(
-        index: index,
-        status: SeatStatus.free,
-        userId: null,
-      );
-    });
-  }
 
-  @override
-  void dispose() {
-    fromController.dispose();
-    toController.dispose();
-    descriptionController.dispose();
-    super.dispose();
-  }
 }

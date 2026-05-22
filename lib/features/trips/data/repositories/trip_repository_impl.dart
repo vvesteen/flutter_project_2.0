@@ -23,7 +23,7 @@ class TripRepositoryImpl implements TripRepository {
       from: model.from!,
       to: model.to!,
       departureTime: model.departureTime!,
-      freeSeats: model.freeSeats,
+      //freeSeats: model.freeSeats,
       pricePerSeat: model.pricePerSeat!,
       driverId: userId,
       stops: model.stops,
@@ -32,9 +32,46 @@ class TripRepositoryImpl implements TripRepository {
 
       // 🔥 ВОТ ЭТО ДОБАВЬ
       seats: SeatGenerator.generate(model.freeSeats),
+      passengerIds: [],
+      layout: model.layout,
     );
 
     await _firestore.collection('trips').add(trip.toMap());
+  }
+
+  @override
+  Stream<List<Trip>> getMyTrips(String userId) {
+    return remoteDataSource.getMyTrips(userId);
+  }
+
+
+  @override
+  Future<void> joinTrip({
+    required String tripId,
+    required String userId,
+  }) async {
+
+    final doc = await _firestore
+        .collection('trips')
+        .doc(tripId)
+        .get();
+
+    if (!doc.exists || doc.data() == null) {
+      throw Exception('Поездка не найдена');
+    }
+
+    final trip = Trip.fromMap(doc.data()!, doc.id);
+
+    if (trip.passengerIds.contains(userId)) {
+      throw Exception('Вы уже участвуете');
+    }
+
+    await _firestore
+        .collection('trips')
+        .doc(tripId)
+        .update({
+      'passengerIds': FieldValue.arrayUnion([userId]),
+    });
   }
 
   @override
@@ -48,5 +85,6 @@ class TripRepositoryImpl implements TripRepository {
       to: to,
       date: date,
     );
+
   }
 }

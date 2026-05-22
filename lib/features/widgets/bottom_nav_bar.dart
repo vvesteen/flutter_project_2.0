@@ -29,7 +29,7 @@ class BottomNavBar extends StatelessWidget {
           label: 'Создать поездку',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.home),
+          icon: Icon(Icons.search),
           label: 'Поиск поездок',
         ),
       //  BottomNavigationBarItem(

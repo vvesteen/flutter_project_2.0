@@ -1,6 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '../entities/car.dart';
+import '../../../../core/entities/Car.dart';
 
 abstract class CarRepository {
-  Future<void> addCar(Car car);
+  Future<bool> verifyCar({
+    required String plateNumber,
+    required String brandModel,
+    required int year,
+  });
+
+  Future<void> saveCar(Car car);
 }

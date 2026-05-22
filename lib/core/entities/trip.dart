@@ -1,17 +1,22 @@
 import '../../features/seats/Seat.dart';
+import 'car_seat_layout.dart';
 
 class Trip {
   final String id;
   final String from;
   final String to;
   final DateTime departureTime;
-  final int freeSeats;
   final double pricePerSeat;
   final String driverId;
+  int get freeSeats =>
+      seats.where((s) => s.status == SeatStatus.free).length;
   final List<String> stops;
   final Map<String, bool> preferences;
   final String? description;
   final List<Seat> seats;
+  final List<String> passengerIds;
+  final CarSeatLayout layout;
+
 
   // Новые поля для геолокации
   final Map<String, dynamic>? currentLocation;
@@ -23,16 +28,19 @@ class Trip {
     required this.from,
     required this.to,
     required this.departureTime,
-    required this.freeSeats,
     required this.pricePerSeat,
     required this.driverId,
     this.stops = const [],
+
     this.preferences = const {},
     this.description,
     this.currentLocation,
     this.routePath,
     this.sharingEnabled = false,
     required this.seats,
+    this.passengerIds = const [],
+    required this.layout,
+
   });
 
   Trip copyWith({
@@ -50,13 +58,14 @@ class Trip {
     List<Map<String, dynamic>>? routePath,
     bool? sharingEnabled,
     List<Seat>? seats,
+    List<String>? passengerIds,
   }) {
     return Trip(
       id: id ?? this.id,
       from: from ?? this.from,
       to: to ?? this.to,
       departureTime: departureTime ?? this.departureTime,
-      freeSeats: freeSeats ?? this.freeSeats,
+      //freeSeats: freeSeats ?? this.freeSeats,
       pricePerSeat: pricePerSeat ?? this.pricePerSeat,
       driverId: driverId ?? this.driverId,
       stops: stops ?? this.stops,
@@ -66,6 +75,8 @@ class Trip {
       routePath: routePath ?? this.routePath,
       sharingEnabled: sharingEnabled ?? this.sharingEnabled,
       seats: seats ?? this.seats,
+      passengerIds: passengerIds ?? this.passengerIds,
+      layout: layout,
     );
   }
 
@@ -85,6 +96,8 @@ class Trip {
       'routePath': routePath,
       'sharingEnabled': sharingEnabled,
       'seats': seats.map((e) => e.toMap()).toList(),
+      'passengerIds': passengerIds,
+      'layout': layout.name,
 
     };
   }
@@ -95,7 +108,7 @@ class Trip {
       from: (map['from'] ?? '') as String,
       to: (map['to'] ?? '') as String,
       departureTime: DateTime.parse(map['departureTime'] as String),
-      freeSeats: (map['freeSeats'] ?? 0) as int,
+      //freeSeats: (map['freeSeats'] ?? 0) as int,
       pricePerSeat: (map['pricePerSeat'] ?? 0).toDouble(),
       driverId: (map['driverId'] ?? '') as String,
       stops: map['stops'] != null ? List<String>.from(map['stops']) : [],
@@ -113,8 +126,16 @@ class Trip {
         map['seats'].map((e) => Seat.fromMap(e)),
       )
           : [],
+      passengerIds: map['passengerIds'] != null
+          ? List<String>.from(map['passengerIds'])
+          : [],
+      layout: CarSeatLayout.values.byName(
+        map['layout'] ?? 'sevenSeats',
+      ),
     );
+
   }
+
 
   bool get isSharingLocation => sharingEnabled && currentLocation != null;
   double? get currentLat => currentLocation?['lat'] as double?;

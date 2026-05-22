@@ -55,4 +55,22 @@ class TripRemoteDataSource {
 
     return UserEntity.fromMap(doc.data()!, doc.id);
   }
+
+  Stream<List<Trip>> getMyTrips(String userId) {
+    return _firestore
+        .collection('trips')
+        .snapshots()
+        .map((snapshot) {
+
+      return snapshot.docs
+          .map((e) => Trip.fromMap(e.data(), e.id))
+          .where((trip) {
+
+        return trip.driverId == userId ||
+            trip.passengerIds.contains(userId);
+
+      }).toList();
+
+    });
+  }
 }

@@ -1,117 +1,241 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:provider/provider.dart';
 
-import '../../data/repositories/car_repository_impl.dart';
-import '../../domain/entities/car.dart';
+import '../controllers/add_car_controller.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class AddCarScreen extends StatefulWidget {
+
+class AddCarScreen extends StatelessWidget {
   const AddCarScreen({super.key});
 
   @override
-  State<AddCarScreen> createState() => _AddCarScreenState();
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider<AddCarController>(
+      create: (_) => GetIt.instance<AddCarController>(),
+      child: const _AddCarScreenContent(),
+    );
+  }
 }
 
-class _AddCarScreenState extends State<AddCarScreen> {
-  final Car _car = Car();
-  final _formKey = GlobalKey<FormState>();
+class _AddCarScreenContent extends StatefulWidget {
+  const _AddCarScreenContent({super.key});
 
-  bool _isLoading = false;
+  @override
+  State<_AddCarScreenContent> createState() => _AddCarScreenContentState();
+}
 
-  Future<void> _saveCar() async {
-    if (!_formKey.currentState!.validate() || !_car.isValid) {
+class _AddCarScreenContentState extends State<_AddCarScreenContent> {
+  final _plateController = TextEditingController();
+  final _brandController = TextEditingController();
+  final _yearController = TextEditingController();
+
+  String? selectedSteering; // "left" или "right"
+
+  @override
+  void dispose() {
+    _plateController.dispose();
+    _brandController.dispose();
+    _yearController.dispose();
+    super.dispose();
+  }
+
+  void _showSteeringBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(20),
+                child: Text(
+                  'Тип руля',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              ListTile(
+                title: const Text('Левый руль'),
+                trailing: selectedSteering == 'left'
+                    ? const Icon(Icons.check, color: Colors.green)
+                    : null,
+                onTap: () {
+                  setState(() => selectedSteering = 'left');
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: const Text('Правый руль'),
+                trailing: selectedSteering == 'right'
+                    ? const Icon(Icons.check, color: Colors.green)
+                    : null,
+                onTap: () {
+                  setState(() => selectedSteering = 'right');
+                  Navigator.pop(context);
+                },
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _verifyAndAddCar() async {
+    final controller = context.read<AddCarController>();
+
+    if (_plateController.text.trim().isEmpty ||
+        _brandController.text.trim().isEmpty ||
+        _yearController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Заполните все обязательные поля'), backgroundColor: Colors.red),
+        const SnackBar(content: Text('Заполните все обязательные поля')),
       );
       return;
     }
 
-    setState(() => _isLoading = true);
-
-    try {
-      final repository = CarRepositoryImpl();
-      await repository.addCar(_car);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Машина успешно добавлена!'), backgroundColor: Colors.green),
-      );
-
-      Navigator.pop(context); // возвращаемся назад
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка: $e'), backgroundColor: Colors.red),
-      );
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
+    await controller.verifyAndAdd(
+      plate: _plateController.text.trim(),
+      brandModel: _brandController.text.trim(),
+      year: int.tryParse(_yearController.text.trim()) ?? 0,
+      context: context,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Добавить автомобиль')),
-      body: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Марка *'),
-                onChanged: (v) => _car.carBrand = v.trim(),
-                validator: (v) => v!.isEmpty ? 'Обязательное поле' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Модель *'),
-                onChanged: (v) => _car.carModel = v.trim(),
-                validator: (v) => v!.isEmpty ? 'Обязательное поле' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Цвет *'),
-                onChanged: (v) => _car.carColor = v.trim(),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Гос. номер *'),
-                onChanged: (v) => _car.carNumber = v.trim().toUpperCase(),
-                validator: (v) => v!.isEmpty ? 'Обязательное поле' : null,
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Год выпуска *'),
-                keyboardType: TextInputType.number,
-                onChanged: (v) => _car.carYearOfProduce = v.trim(),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                decoration: const InputDecoration(
-                  labelText: 'Количество мест *',
-                  border: OutlineInputBorder(),
-                ),
-                keyboardType: TextInputType.number,
-                onChanged: (v) => _car.numberOfSeats = int.tryParse(v) ?? 0,
-                validator: (String? v) {
-                  if (v == null || v.trim().isEmpty) {
-                    return 'Обязательное поле';
-                  }
-                  final seats = int.tryParse(v.trim());
-                  if (seats == null || seats < 1) {
-                    return 'Минимум 1 место';
-                  }
-                  return null;
-                },
-              ),
+    final controller = context.watch<AddCarController>();
 
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _isLoading ? null : _saveCar,
-                child: _isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text('Сохранить автомобиль'),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Добавить автомобиль'),
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Проверка автомобиля через базу Тундук',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 24),
+
+            // Госномер
+            TextField(
+              controller: _plateController,
+              textCapitalization: TextCapitalization.characters,
+              decoration: const InputDecoration(
+                labelText: 'Государственный номер *',
+                hintText: '07KG542ACZ',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.directions_car),
               ),
+            ),
+            const SizedBox(height: 16),
+
+            // Марка и модель
+            TextField(
+              controller: _brandController,
+              decoration: const InputDecoration(
+                labelText: 'Марка и модель *',
+                hintText: 'SETRA S315HD',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.branding_watermark),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Год выпуска
+            TextField(
+              controller: _yearController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Год выпуска *',
+                hintText: '1998',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.calendar_today),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Выбор типа руля
+
+// ...
+
+        GestureDetector(
+        onTap: _showSteeringBottomSheet,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade400),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              const Icon(                  // ← Используй FaIcon вместо Icon
+                Icons.adjust,
+                size: 24,
+                color: Colors.grey,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  selectedSteering == null
+                      ? 'Тип руля *'
+                      : selectedSteering == 'left'
+                      ? 'Левый руль'
+                      : 'Правый руль',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: selectedSteering == null ? Colors.grey : Colors.black,
+                  ),
+                ),
+              ),
+              const Icon(Icons.arrow_drop_down),
+
             ],
           ),
+        ),
+      ),
+
+            const SizedBox(height: 32),
+
+            // Кнопка "Проверить и добавить"
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: controller.isLoading ? null : _verifyAndAddCar,
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: controller.isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                  'Проверить и добавить',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ),
+
+            if (controller.errorMessage != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Text(
+                  controller.errorMessage!,
+                  style: const TextStyle(color: Colors.red),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+          ],
         ),
       ),
     );

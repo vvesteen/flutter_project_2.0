@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
@@ -9,6 +10,7 @@ import '../../../data/repositories/trip_repository_impl.dart';
 import '../../../domain/usecases/search_trips_usecase.dart';
 import '../../trip_card.dart';
 import '../../trip_more_details.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 final searchTripsUseCaseProvider = Provider<SearchTripsUseCase>((ref) {
   final repo = TripRepositoryImpl(
@@ -39,6 +41,7 @@ class FindTripsScreen extends ConsumerWidget {
     final to = ref.watch(searchToProvider);
     final date = ref.watch(searchDateProvider);
     final tripsAsync = ref.watch(filteredTripsProvider);
+    final userId = FirebaseAuth.instance.currentUser!.uid;
 
     final hasFilters = from.isNotEmpty || to.isNotEmpty || date != null;
 
@@ -69,16 +72,29 @@ class FindTripsScreen extends ConsumerWidget {
                 const SizedBox(height: 12),
                 GestureDetector(
                   onTap: () async {
-                    final picked = await showDatePicker(
+                    DateTime selectedDate = date ?? DateTime.now();
+
+                    await showModalBottomSheet(
                       context: context,
-                      initialDate: DateTime.now(),
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime.now().add(const Duration(days: 365)),
+                      builder: (_) {
+                        return SizedBox(
+                          height: 250,
+                          child: CupertinoDatePicker(
+                            mode: CupertinoDatePickerMode.date,
+                            initialDateTime: selectedDate,
+                            minimumDate: DateTime.now(),
+                            maximumDate:
+                            DateTime.now().add(const Duration(days: 365)),
+                            onDateTimeChanged: (value) {
+                              selectedDate = value;
+                            },
+                          ),
+                        );
+                      },
                     );
 
-                    if (picked != null && context.mounted) {
-                      ref.read(searchDateProvider.notifier).state = picked;
-                    }
+                    ref.read(searchDateProvider.notifier).state =
+                        selectedDate;
                   },
                   child: AbsorbPointer(
                     child: TextField(
@@ -127,7 +143,7 @@ class FindTripsScreen extends ConsumerWidget {
                   final trip = trips[index];
                   return TripCard(
                     trip: trip,
-
+                    currentUserId: userId, // 👈 ДОБАВЬ ЭТО
                     onTap: () {
                       Navigator.push(
                         context,
@@ -136,7 +152,6 @@ class FindTripsScreen extends ConsumerWidget {
                         ),
                       );
                     },
-
                   );
                 },
               ),

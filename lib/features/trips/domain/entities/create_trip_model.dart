@@ -1,3 +1,5 @@
+import '../../../../core/entities/car_seat_layout.dart';
+
 class CreateTripModel {
   String? from;
   String? to;
@@ -6,7 +8,8 @@ class CreateTripModel {
   int freeSeats = 1;
   double? pricePerSeat;
   String? description;
-
+  CarSeatLayout layout =
+      CarSeatLayout.sevenSeats;
 
   List<String> stops = [];
 
@@ -28,6 +31,7 @@ class CreateTripModel {
       'driverId': userId,
       'status': 'planned',           // ← Убедись, что здесь тоже есть
       'stops': stops,
+      'layout': layout.name,
     };
   }
 }

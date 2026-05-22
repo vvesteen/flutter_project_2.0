@@ -1,9 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_project_2/features/widgets/safety_rules.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
-import '../../../../core/di/injection_container.dart';
+import '../../../../main.dart';
 import '../../../widgets/_CarPlaceholder.dart';
 import '../bloc/profile_bloc.dart';
 import '../../../../core/entities/UserEntity.dart';
@@ -102,14 +102,14 @@ class _UserProfileView extends StatelessWidget {
     );
   }
 
+// ==================== END DRAWER ====================
   Widget _buildEndDrawer(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(color: colorScheme.primary),
+            decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary),
             child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -127,25 +127,96 @@ class _UserProfileView extends StatelessWidget {
             leading: const Icon(Icons.security_rounded),
             title: const Text('Правила безопасности'),
             onTap: () {
-              Navigator.pop(context); // закрыть drawer
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SafetyRules(),
-                ),
-              );
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const SafetyRules()));
             },
           ),
           ListTile(
             leading: const Icon(Icons.language_rounded),
             title: const Text('Выбор языка'),
-            onTap: () => Navigator.pop(context),
+            onTap: () {
+              Navigator.pop(context);           // закрываем Drawer
+              _showLanguageBottomSheet(context); // открываем BottomSheet
+            },
           ),
           const Divider(),
           ListTile(leading: const Icon(Icons.help_outline_rounded), title: const Text('Помощь и поддержка'), onTap: () => Navigator.pop(context)),
           ListTile(leading: const Icon(Icons.info_outline_rounded), title: const Text('О приложении'), onTap: () => Navigator.pop(context)),
         ],
       ),
+    );
+  }
+
+// ==================== BOTTOM SHEET ВЫБОРА ЯЗЫКА ====================
+  void _showLanguageBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(20),
+                child: Text('Тилди тандоо / Выбор языка',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              ),
+              _languageOption(context, 'Кыргызча', 'ky'),
+              _languageOption(context, 'Русский', 'ru'),
+              _languageOption(context, 'English', 'en'),
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _languageOption(BuildContext context, String title, String langCode) {
+    final currentLocale = Localizations.localeOf(context).languageCode;
+    final isSelected = currentLocale == langCode;
+
+    return ListTile(
+      title: Text(title),
+      trailing: isSelected
+          ? const Icon(Icons.check, color: Colors.green)
+          : null,
+      onTap: () {
+        Navigator.pop(context);
+
+        // 🔥 правильная смена языка
+        ProviderScope.containerOf(context, listen: false)
+            .read(localeProvider.notifier)
+            .state = Locale(langCode);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Язык изменён: $title')),
+        );
+      },
+    );
+  }
+
+
+  Widget _languageTile(BuildContext context, String title, String langCode) {
+    final isSelected = Localizations.localeOf(context).languageCode == langCode;
+
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      title: Text(title, style: const TextStyle(fontSize: 17)),
+      trailing: isSelected ? const Icon(Icons.check, color: Colors.green, size: 26) : null,
+      onTap: () {
+        Navigator.pop(context);
+        // Пока просто уведомление (позже подключим UseCase)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Язык изменён на: $title'),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      },
     );
   }
 
@@ -378,4 +449,5 @@ class _UserProfileView extends StatelessWidget {
       ),
     );
   }
+
 }

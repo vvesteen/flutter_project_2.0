@@ -1,105 +1,133 @@
-// widgets/seat_selector.dart
 import 'package:flutter/material.dart';
-import '../../../../../features/seats/Seat.dart';
+
+import '../../core/entities/car_seat_layout.dart';
+import '../seats/Seat.dart';
 
 class SeatSelector extends StatelessWidget {
   final List<Seat> seats;
+
+  final CarSeatLayout layout;
+
   final Function(Seat) onSeatSelected;
-  final bool isDriverMode; // для водителя
+
+  final Function(Seat)? onOccupiedSeatTap;
+
+  final bool readOnly;
 
   const SeatSelector({
     super.key,
     required this.seats,
+    required this.layout,
     required this.onSeatSelected,
-    this.isDriverMode = false,
+    this.onOccupiedSeatTap,
+    this.readOnly = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Примерная схема на 4 места (1 водитель + 3 пассажира)
-    // Можно расширить позже
-    return Column(
-      children: [
-        // Передний ряд
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Водитель (слева)
-            _buildSeat(seats[0], label: 'Водитель'),
-            const SizedBox(width: 40),
-            // Пассажир спереди
-            if (seats.length > 1) _buildSeat(seats[1]),
-          ],
-        ),
 
-        const SizedBox(height: 40),
+    return Container(
+      height: 340,
+      padding: const EdgeInsets.all(16),
 
-        // Задний ряд (3 места)
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (seats.length > 2) _buildSeat(seats[2]),
-            const SizedBox(width: 12),
-            if (seats.length > 3) _buildSeat(seats[3]),
-            const SizedBox(width: 12),
-            if (seats.length > 4) _buildSeat(seats[4]),
-          ],
-        ),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.black),
+        borderRadius: BorderRadius.circular(32),
+      ),
 
-        const SizedBox(height: 20),
-        const Text('Экран / Капот', style: TextStyle(color: Colors.grey)),
-      ],
+      child: Stack(
+        children: _buildSeats(),
+      ),
     );
   }
 
-  Widget _buildSeat(Seat seat, {String? label}) {
-    final isOccupied = seat.status != SeatStatus.free;
+  List<Widget> _buildSeats() {
 
-    return GestureDetector(
-      onTap: isOccupied ? null : () => onSeatSelected(seat),
-      child: Column(
-        children: [
-          Container(
-            width: 30,
-            height: 30,
-            decoration: BoxDecoration(
-              color: seat.color,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: seat.status == SeatStatus.selected
-                    ? Colors.orange
-                    : Colors.grey.shade400,
-                width: 2,
+    final positions =
+    layout == CarSeatLayout.sevenSeats
+        ? _sevenSeatPositions()
+        : _eightSeatPositions();
+
+    return List.generate(
+      seats.length,
+          (index) {
+
+        final seat = seats[index];
+
+        final pos = positions[index];
+
+        return Positioned(
+          left: pos.dx,
+          top: pos.dy,
+
+          child: GestureDetector(
+            onTap: () {
+
+              if (readOnly) return;
+
+              if (seat.status == SeatStatus.free) {
+                onSeatSelected(seat);
+              }
+
+              else {
+                onOccupiedSeatTap?.call(seat);
+              }
+            },
+
+            child: Container(
+              width: 52,
+              height: 52,
+
+              decoration: BoxDecoration(
+                color: seat.color,
+                shape: BoxShape.circle,
               ),
-              boxShadow: [
-                if (!isOccupied)
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(2, 2),
-                  ),
-              ],
-            ),
-            child: Center(
-              child: seat.status == SeatStatus.free
-                  ? const Icon(Icons.event_seat, color: Colors.grey)
-                  : Text(
-                seat.status == SeatStatus.male ? 'M' : 'Ж',
+
+              alignment: Alignment.center,
+
+              child: Text(
+                seat.label,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
-                  fontSize: 18,
                 ),
               ),
             ),
           ),
-          if (label != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: Text(label, style: const TextStyle(fontSize: 12)),
-            ),
-        ],
-      ),
+        );
+      },
     );
+  }
+
+  List<Offset> _sevenSeatPositions() {
+    return const [
+
+      Offset(40, 20),
+      Offset(160, 20),
+
+      Offset(40, 110),
+      Offset(160, 110),
+
+      Offset(40, 200),
+      Offset(160, 200),
+
+      Offset(280, 110),
+    ];
+  }
+
+  List<Offset> _eightSeatPositions() {
+    return const [
+
+      Offset(40, 20),
+      Offset(160, 20),
+      Offset(280, 20),
+
+      Offset(40, 110),
+      Offset(160, 110),
+
+      Offset(40, 200),
+      Offset(160, 200),
+      Offset(280, 200),
+    ];
   }
 }

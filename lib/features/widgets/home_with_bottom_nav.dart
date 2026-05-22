@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_project_2/features/trips/presentation/my_trips/screens/my_trips_screen.dart';
 
 import '../profile/presentation/screens/user_profile_page.dart';
 import '../trips/presentation/create_trip/screens/create_trip_screen.dart';
@@ -17,7 +18,7 @@ class _HomeWithBottomNavState extends State<HomeWithBottomNav> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    const Center(child: Text("Мои поездки")),
+    MyTripsScreen(),
     CreateTripScreen(),
     FindTripsScreen(),
     //const Center(child: Text("Мой профиль")),
